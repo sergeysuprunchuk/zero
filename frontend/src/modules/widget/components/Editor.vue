@@ -10,10 +10,18 @@ import Slots from "./Slots.vue";
 import Tree from "primevue/tree";
 import { TreeNode } from "primevue/treenode";
 import Widget from "./Widget.vue";
+import { context, IContext } from "../utils/context";
 
 const widgetTree = ref<IWidget>(creator.widget());
 
-const currentId = ref(widgetTree.value.id);
+const currentId = ref<number>(widgetTree.value.id);
+
+const ctx = ref<IContext>(
+	context.createNoId(null, {
+		email: "zin@yandex.ru",
+		password: "yandex.ru",
+	}),
+);
 
 const findWidget = (id: number): IWidget | null => {
 	const queue: IWidget[] = [widgetTree.value];
@@ -64,7 +72,10 @@ const nodeTree = (widget: IWidget): TreeNode[] => {
 			/>
 		</aside>
 		<div class="w-full h-full flex items-center justify-center">
-			<Widget :widget="widgetTree" />
+			<Widget
+				:parent-ctx="ctx"
+				:widget="widgetTree"
+			/>
 		</div>
 		<aside class="w-72 h-full flex flex-col gap-6 p-3">
 			<FormKit
@@ -77,8 +88,10 @@ const nodeTree = (widget: IWidget): TreeNode[] => {
 			<template v-if="currentWidget.type">
 				<Props
 					v-if="currentWidget.type.scheme"
+					:id="currentId"
 					:scheme="currentWidget.type.scheme"
 					v-model="currentWidget.props"
+					:namespace="Object.keys(context.allVar(ctx, currentId))"
 				/>
 				<Slots
 					v-if="currentWidget.type.slots"
