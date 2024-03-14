@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import App from "@/App.vue";
 import PrimeVue from "primevue/config";
 import Wind from "@/assets/presets/wind";
-import { formkit } from "@/ui/extensions/formkit";
+import { formkit } from "@/ui/formkit";
 import "@/index.css";
 
 createApp(App)
