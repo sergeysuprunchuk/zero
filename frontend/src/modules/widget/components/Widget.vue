@@ -4,7 +4,7 @@ import Button from "primevue/button";
 import { IProp } from "../types/prop";
 import { caster } from "../utils/caster";
 import { IContext, context } from "../utils/context";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps<{ parentCtx: IContext | null; widget: IWidget }>();
 
@@ -13,14 +13,28 @@ const ctx = ref<IContext>(context.create(props.widget.id, props.parentCtx));
 context.add(ctx.value, "username", "zin");
 context.add(ctx.value, "email", "zin@yandex.ru");
 
+watch(
+	() => props.widget.init,
+	() => {
+		props.widget.init?.forEach((handler) => {
+			const callback = context.get(ctx.value, handler.name);
+			if (!callback) return;
+			(<any>callback)(getProps(handler.props)).then((data: any) => {
+				context.add(ctx.value, "data", { ...data });
+			});
+		});
+	},
+	{ deep: true },
+);
+
 const getComponent = (widget: IWidget) => {
 	return { Button, "": null }[widget.type?.name ?? ""];
 };
 
-const getProps = (widget: IWidget) => {
+const getProps = (props: IProp[] | undefined) => {
 	const result: any = {};
 
-	widget.props?.forEach((prop: IProp) => {
+	props?.forEach((prop: IProp) => {
 		if (prop.isVar) {
 			result[prop.name] = context.get(ctx.value, prop.value);
 			return;
@@ -35,7 +49,7 @@ const getProps = (widget: IWidget) => {
 <template>
 	<component
 		:is="getComponent(widget)"
-		v-bind="getProps(widget)"
+		v-bind="getProps(widget.props)"
 	>
 		<template
 			v-for="slot in widget.slots"
@@ -49,7 +63,7 @@ const getProps = (widget: IWidget) => {
 				<component
 					v-if="widget.type?.dataTransfer"
 					:is="getComponent(widget)"
-					v-bind="getProps(widget)"
+					v-bind="getProps(widget.props)"
 				>
 					<template
 						v-for="slot in widget.slots"

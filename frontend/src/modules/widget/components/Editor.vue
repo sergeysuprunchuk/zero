@@ -11,6 +11,7 @@ import Tree from "primevue/tree";
 import { TreeNode } from "primevue/treenode";
 import Widget from "./Widget.vue";
 import { context, IContext } from "../utils/context";
+import Handlers from "./Handlers.vue";
 
 const widgetTree = ref<IWidget>(creator.widget());
 
@@ -20,6 +21,14 @@ const ctx = ref<IContext>(
 	context.createNoId(null, {
 		email: "zin@yandex.ru",
 		password: "yandex.ru",
+		get: async ({ url }: { url: string }) => {
+			try {
+				const response = await fetch(url);
+				return { data: await response.json() };
+			} catch {
+				return null;
+			}
+		},
 	}),
 );
 
@@ -98,6 +107,10 @@ const nodeTree = (widget: IWidget): TreeNode[] => {
 					:slots="currentWidget.type.slots"
 					v-model="currentWidget.slots"
 					@add="currentId = $event"
+				/>
+				<Handlers
+					v-model="currentWidget.init"
+					:namespace="Object.keys(context.allVar(ctx, currentId))"
 				/>
 			</template>
 		</aside>

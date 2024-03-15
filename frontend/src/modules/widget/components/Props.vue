@@ -141,6 +141,7 @@ watch(
 			:model-value="getProp(item.name)"
 			@update:model-value="(value: unknown) => setProp(item.name, value)"
 		/>
+
 		<FormKit
 			v-else
 			type="primedropdown"
