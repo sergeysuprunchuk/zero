@@ -12,23 +12,23 @@ const inputs: any = {};
 	{
 		type: "primetext",
 		component: InputText,
-		props: ["placeholder"],
+		props: ["placeholder", "class"],
 	},
 	{
 		type: "primenumber",
 		component: InputNumber,
-		props: ["placeholder", "min", "max"],
+		props: ["placeholder", "min", "max", "class"],
 	},
-	{ type: "primecheckbox", component: Checkbox, props: ["binary"] },
+	{ type: "primecheckbox", component: Checkbox, props: ["binary", "class"] },
 	{
 		type: "primedropdown",
 		component: Dropdown,
-		props: ["options", "optionLabel", "placeholder"],
+		props: ["options", "optionLabel", "placeholder", "class"],
 	},
 	{
 		type: "primemulti",
 		component: MultiSelect,
-		props: ["options", "optionLabel", "placeholder"],
+		props: ["options", "optionLabel", "placeholder", "class"],
 	},
 ]).forEach((input) => {
 	inputs[input.type] = createInput(
@@ -44,9 +44,11 @@ const inputs: any = {};
 						},
 						...(() => {
 							const result: any = {};
-							input.props.forEach(
-								(prop: string) => (result[prop] = props.context[prop]),
-							);
+							input.props.forEach((prop: string) => {
+								if (props.context[prop] !== undefined) {
+									result[prop] = props.context[prop];
+								}
+							});
 							return result;
 						})(),
 					});

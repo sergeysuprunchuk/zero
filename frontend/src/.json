@@ -1,0 +1,350 @@
+{
+	"id": 1431481953437191,
+	"type": {
+		"name": "DataTable",
+		"dataTransfer": false,
+		"params": [
+			{
+				"set": {
+					"_custom": {
+						"type": "function",
+						"display": "<span style=\"opacity:.5;\">function</span> set(arg)",
+						"tooltip": "<pre>(arg) => {\n          return JSON.parse(arg);\n        }</pre>",
+						"_reviveId": 2
+					}
+				},
+				"get": {
+					"_custom": {
+						"type": "function",
+						"display": "<span style=\"opacity:.5;\">function</span> get(arg)",
+						"tooltip": "<pre>(arg) => {\n          return JSON.stringify(arg);\n        }</pre>",
+						"_reviveId": 3
+					}
+				},
+				"binds": {
+					"type": "primetext",
+					"name": "value",
+					"placeholder": "данные"
+				}
+			}
+		],
+		"slots": ["default"],
+		"component": {
+			"_custom": {
+				"type": "component-definition",
+				"display": "DataTable",
+				"tooltip": "Component definition"
+			}
+		}
+	},
+	"params": [
+		{
+			"isVar": false,
+			"name": "value",
+			"type": "object",
+			"value": [
+				{
+					"id": 1,
+					"name": "Leanne Graham",
+					"username": "Bret",
+					"email": "Sincere@april.biz",
+					"address": {
+						"street": "Kulas Light",
+						"suite": "Apt. 556",
+						"city": "Gwenborough",
+						"zipcode": "92998-3874",
+						"geo": { "lat": "-37.3159", "lng": "81.1496" }
+					},
+					"phone": "1-770-736-8031 x56442",
+					"website": "hildegard.org",
+					"company": {
+						"name": "Romaguera-Crona",
+						"catchPhrase": "Multi-layered client-server neural-net",
+						"bs": "harness real-time e-markets"
+					}
+				},
+				{
+					"id": 2,
+					"name": "Ervin Howell",
+					"username": "Antonette",
+					"email": "Shanna@melissa.tv",
+					"address": {
+						"street": "Victor Plains",
+						"suite": "Suite 879",
+						"city": "Wisokyburgh",
+						"zipcode": "90566-7771",
+						"geo": { "lat": "-43.9509", "lng": "-34.4618" }
+					},
+					"phone": "010-692-6593 x09125",
+					"website": "anastasia.net",
+					"company": {
+						"name": "Deckow-Crist",
+						"catchPhrase": "Proactive didactic contingency",
+						"bs": "synergize scalable supply-chains"
+					}
+				},
+				{
+					"id": 3,
+					"name": "Clementine Bauch",
+					"username": "Samantha",
+					"email": "Nathan@yesenia.net",
+					"address": {
+						"street": "Douglas Extension",
+						"suite": "Suite 847",
+						"city": "McKenziehaven",
+						"zipcode": "59590-4157",
+						"geo": { "lat": "-68.6102", "lng": "-47.0653" }
+					},
+					"phone": "1-463-123-4447",
+					"website": "ramiro.info",
+					"company": {
+						"name": "Romaguera-Jacobson",
+						"catchPhrase": "Face to face bifurcated interface",
+						"bs": "e-enable strategic applications"
+					}
+				}
+			]
+		}
+	],
+	"slots": [
+		{
+			"name": "default",
+			"widgets": [
+				{
+					"id": 6894293362284000,
+					"type": {
+						"name": "Column",
+						"dataTransfer": true,
+						"params": [
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "header",
+									"placeholder": "заголовок"
+								}
+							},
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "field",
+									"placeholder": "поле"
+								}
+							}
+						],
+						"slots": ["body"],
+						"component": {
+							"_custom": {
+								"type": "component-definition",
+								"display": "Column",
+								"tooltip": "Component definition"
+							}
+						}
+					},
+					"params": [
+						{
+							"isVar": false,
+							"name": "header",
+							"type": "string",
+							"value": "hello world"
+						},
+						{
+							"isVar": false,
+							"name": "field",
+							"type": "string",
+							"value": "name"
+						}
+					]
+				},
+				{
+					"id": 364518157474876,
+					"type": {
+						"name": "Column",
+						"dataTransfer": true,
+						"params": [
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "header",
+									"placeholder": "заголовок"
+								}
+							},
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "field",
+									"placeholder": "поле"
+								}
+							}
+						],
+						"slots": ["body"],
+						"component": {
+							"_custom": {
+								"type": "component-definition",
+								"display": "Column",
+								"tooltip": "Component definition"
+							}
+						}
+					},
+					"params": [
+						{
+							"isVar": false,
+							"name": "header",
+							"type": "string",
+							"value": "bye world"
+						},
+						{
+							"isVar": false,
+							"name": "field",
+							"type": "string",
+							"value": "username"
+						}
+					]
+				},
+				{
+					"id": 8785618664132389,
+					"type": {
+						"name": "Column",
+						"dataTransfer": true,
+						"params": [
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "header",
+									"placeholder": "заголовок"
+								}
+							},
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "field",
+									"placeholder": "поле"
+								}
+							}
+						],
+						"slots": ["body"],
+						"component": {
+							"_custom": {
+								"type": "component-definition",
+								"display": "Column",
+								"tooltip": "Component definition"
+							}
+						}
+					},
+					"params": [
+						{
+							"isVar": false,
+							"name": "header",
+							"type": "string",
+							"value": "действия"
+						}
+					],
+					"slots": [
+						{
+							"name": "body",
+							"widgets": [
+								{
+									"id": 4255591309331392,
+									"type": {
+										"name": "Button",
+										"dataTransfer": false,
+										"params": [
+											{
+												"binds": {
+													"type": "primetext",
+													"name": "label",
+													"placeholder": "этикетка"
+												}
+											},
+											{
+												"binds": {
+													"type": "primedropdown",
+													"name": "severity",
+													"placeholder": "severity",
+													"options": [
+														"success",
+														"help",
+														"secondary",
+														"warning",
+														"danger",
+														"contrast"
+													]
+												}
+											}
+										],
+										"slots": ["default"],
+										"component": {
+											"_custom": {
+												"type": "component-definition",
+												"display": "Button",
+												"tooltip": "Component definition"
+											}
+										}
+									},
+									"params": [
+										{
+											"isVar": false,
+											"name": "label",
+											"type": "string",
+											"value": "удалить"
+										},
+										{
+											"isVar": false,
+											"name": "severity",
+											"type": "string",
+											"value": "danger"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"id": 2660032199399169,
+					"type": {
+						"name": "Column",
+						"dataTransfer": true,
+						"params": [
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "header",
+									"placeholder": "заголовок"
+								}
+							},
+							{
+								"binds": {
+									"type": "primetext",
+									"name": "field",
+									"placeholder": "поле"
+								}
+							}
+						],
+						"slots": ["body"],
+						"component": {
+							"_custom": {
+								"type": "component-definition",
+								"display": "Column",
+								"tooltip": "Component definition"
+							}
+						}
+					},
+					"params": [
+						{
+							"isVar": false,
+							"name": "header",
+							"type": "string",
+							"value": "привет"
+						},
+						{
+							"isVar": false,
+							"name": "field",
+							"type": "string",
+							"value": "address.city"
+						}
+					]
+				}
+			]
+		}
+	]
+}
