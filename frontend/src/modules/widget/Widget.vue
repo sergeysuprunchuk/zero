@@ -1,60 +1,46 @@
 <script lang="ts" setup>
-import { IContext } from "@/modules/context";
+import { create, IContext } from "@/modules/context";
 import { IWidget } from "./types";
 import { bind } from "@/modules/param";
 import { widgetByType } from "@/modules/widgetType";
-import { computed, ref } from "vue";
-import Skeleton from "primevue/skeleton";
+import { inject, ref } from "vue";
+import ProgressSpinner from "primevue/progressspinner";
 import { executeAll } from "@/modules/handler";
-import "primevue/datatable/DataTable.vue";
+import { bind as bindEvent } from "@/modules/event";
 
 const props = defineProps<{ ctx: IContext; widget: IWidget }>();
 
-const loading = ref<boolean>(true);
+const newCtx = ref<IContext>(create(props.ctx));
 
-executeAll(props.ctx, props.widget.handlers).then(() => {
-	loading.value = false;
+const register = inject("register", (_: number, ctx: IContext): IContext => {
+	return ctx;
 });
 
-const computedBind = computed(
-	() => {
-		return bind(props.ctx, props.widget.params);
-	},
-	{
-		onTrigger: () => {
-			console.log("computed slots");
-		},
-	},
-);
+register(props.widget.id, newCtx.value);
 
-const computedSlots = computed(
-	() => {
-		return props.widget.slots;
-	},
-	{
-		onTrigger: () => {
-			console.log("computed slots");
-		},
-	},
-);
+const loading = ref<boolean>(true);
 
-const getWidget = computed(() => props.widget);
+executeAll(newCtx.value, props.widget.handlers).then(() => {
+	loading.value = false;
+});
 </script>
 
 <template>
-	<Skeleton
+	<ProgressSpinner
 		v-if="loading"
-		class="w-full h-full"
+		style="width: 50px; height: 50px"
+		strokeWidth="4"
 	/>
 	<component
 		v-else
-		:is="widgetByType(getWidget.type.name)"
-		v-bind="computedBind"
+		:is="widgetByType(widget.type.name)"
+		v-bind="bind(newCtx, widget.params)"
+		v-on="bindEvent(newCtx, widget.emits)"
 	>
 		<template
-			v-for="slot in computedSlots"
+			v-for="slot in widget.slots"
 			:key="slot.name"
-			v-slot:[slot.name]
+			v-slot:[slot.name]="slotProps"
 		>
 			<template
 				v-for="widget in slot.widgets"
@@ -63,26 +49,25 @@ const getWidget = computed(() => props.widget);
 				<component
 					v-if="widget.type.dataTransfer"
 					:is="widgetByType(widget.type.name)"
-					v-bind="bind(ctx, widget.params)"
-					:columnKey="Math.random().toString(16)"
+					v-bind="bind(newCtx, widget.params)"
 				>
 					<template
 						v-for="slot in widget.slots"
 						:key="slot.name"
-						v-slot:[slot.name]
+						v-slot:[slot.name]="slotProps"
 					>
 						<Widget
 							v-for="widget in slot.widgets"
 							:key="widget.id"
 							:widget="widget"
-							:ctx="ctx"
+							:ctx="create(newCtx, { ...slotProps })"
 						/>
 					</template>
 				</component>
 				<Widget
 					v-else
 					:widget="widget"
-					:ctx="ctx"
+					:ctx="create(newCtx, { ...slotProps })"
 				/>
 			</template>
 		</template>

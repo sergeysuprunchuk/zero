@@ -5,5 +5,5 @@ export interface IWidgetType {
 	dataTransfer: boolean;
 	params?: IParamSchema[];
 	slots?: string[];
-	emits?: any[];
+	emits?: string[];
 }

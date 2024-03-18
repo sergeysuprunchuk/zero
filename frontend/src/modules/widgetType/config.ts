@@ -33,16 +33,17 @@ export const config: ({ component: any } & IWidgetType)[] = [
 		],
 		slots: ["default"],
 		component: Button,
+		emits: ["click"],
 	},
 	{
 		name: "DataTable",
 		dataTransfer: false,
 		params: [
 			{
-				set: (arg: unknown): unknown => {
+				set: (arg: any): unknown => {
 					return JSON.parse(arg);
 				},
-				get: (arg: unknown): unknown => {
+				get: (arg: any): unknown => {
 					return JSON.stringify(arg);
 				},
 				binds: {

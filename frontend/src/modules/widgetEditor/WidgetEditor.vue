@@ -3,14 +3,14 @@ import { ParamForm } from "@/modules/param";
 import { ISchema, MultiForm } from "@/modules/handler";
 import { IWidgetType, TypeSelect } from "@/modules/widgetType";
 import SelectButton from "primevue/selectbutton";
-import { computed, reactive, ref } from "vue";
+import { provide, ref } from "vue";
 import _ from "lodash";
 import { Forms } from "./enums";
 import { IContext } from "@/modules/context";
 import { IWidget, nullWidget, Widget } from "@/modules/widget";
-import { Nullable } from "primevue/ts-helpers";
 import SlotForm from "@/modules/slot/SlotForm.vue";
 import WidgetTree from "@/modules/widgetTree/WidgetTree.vue";
+import { MultiEventForm } from "@/modules/event";
 
 defineProps<{
 	ctx: IContext;
@@ -19,11 +19,18 @@ defineProps<{
 
 const forms = _.values(Forms);
 
+const contexts = ref<{ [key: number]: IContext }>({});
+
+provide("register", (id: number, ctx: IContext): IContext => {
+	contexts.value[id] = ctx;
+	return ctx;
+});
+
 const currentForm = ref<string>(forms[0]);
 
-const widget = reactive<IWidget>(nullWidget());
+const widget = ref<IWidget>(nullWidget());
 
-const currentWidget = ref<Nullable<IWidget>>(widget);
+const currentWidget = ref<IWidget>(widget.value);
 
 const setType = (type: IWidgetType) => {
 	if (currentWidget.value) {
@@ -48,13 +55,21 @@ const widgetKey = ref<number>(0);
 					v-if="currentWidget.type.params"
 					v-show="currentForm === Forms.PARAMS"
 					:key="currentWidget.id + currentWidget.type.name"
-					:ctx="ctx"
+					:ctx="contexts[currentWidget.id]"
 					:schemas="currentWidget.type.params"
 					v-model="currentWidget.params"
 				/>
+				<MultiEventForm
+					v-if="currentWidget.type.emits"
+					v-show="currentForm === Forms.EVENTS"
+					:handlers="handlers"
+					:ctx="contexts[currentWidget.id]"
+					v-model="currentWidget.emits"
+					:event-names="currentWidget.type.emits"
+				/>
 				<MultiForm
 					v-show="currentForm === Forms.HANDLERS"
-					:ctx="ctx"
+					:ctx="contexts[currentWidget.id]"
 					:key="currentWidget.id + currentWidget.type.name"
 					:schemas="handlers"
 					v-model="currentWidget.handlers"

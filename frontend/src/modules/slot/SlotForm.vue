@@ -13,7 +13,7 @@ const props = withDefaults(
 		slotNames: string[];
 		title?: string;
 	}>(),
-	{ title: "Параметры" },
+	{ title: "Слоты" },
 );
 
 const emit = defineEmits<{
