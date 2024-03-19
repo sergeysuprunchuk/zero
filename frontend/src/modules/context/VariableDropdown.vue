@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { Nullable } from "primevue/ts-helpers";
 import { IContext } from "./types";
-import { variables } from "./utils";
-import { FormKit } from "@formkit/vue";
-import _ from "lodash";
+import { keyTree, variables } from "./utils";
+import TreeSelect from "primevue/treeselect";
 
 defineProps<{ modelValue: Nullable<string>; ctx: IContext }>();
 
@@ -13,11 +12,12 @@ const emit = defineEmits<{
 </script>
 
 <template>
-	<FormKit
-		type="primedropdown"
-		placeholder="Переменные"
-		:options="_.keys(variables(ctx))"
-		:model-value="modelValue"
-		@update:model-value="emit('update:modelValue', $event)"
-	/>
+	<TreeSelect
+		:options="keyTree(variables(ctx))"
+		@node-select="emit('update:modelValue', $event.data)"
+	>
+		<template #value>
+			<span class="text-sm font-normal">{{ modelValue }}</span>
+		</template>
+	</TreeSelect>
 </template>
