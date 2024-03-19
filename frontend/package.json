@@ -10,10 +10,11 @@
 	},
 	"dependencies": {
 		"@formkit/vue": "^1.6.0",
+		"@types/lodash": "^4.17.0",
+		"gridstack": "^10.1.1",
 		"lodash": "^4.17.21",
 		"primevue": "^3.49.1",
-		"vue": "^3.4.21",
-		"@types/lodash": "^4.17.0"
+		"vue": "^3.4.21"
 	},
 	"devDependencies": {
 		"@vitejs/plugin-vue": "^5.0.4",

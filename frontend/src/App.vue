@@ -3,6 +3,8 @@ import { create } from "@/modules/context";
 import { ISchema } from "@/modules/handler";
 import { ref } from "vue";
 import WidgetEditor from "@/modules/widgetEditor/WidgetEditor.vue";
+import Grid from "@/ui/Grid.vue";
+import Button from "primevue/button";
 
 const ctx = ref(
 	create(null, {
@@ -24,6 +26,12 @@ const schemas: ISchema[] = [
 		accepts: [{ binds: { name: "url", type: "primetext" } }],
 	},
 ];
+
+const incr = ref(3);
+
+setTimeout(() => {
+	incr.value++;
+}, 5_000);
 </script>
 
 <template>

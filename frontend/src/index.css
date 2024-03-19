@@ -1,5 +1,6 @@
 @import "assets/styles/fonts.css";
 @import "assets/styles/variables.css";
+@import "gridstack/dist/gridstack.min.css";
 
 @tailwind base;
 @tailwind components;

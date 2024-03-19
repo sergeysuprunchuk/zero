@@ -2,6 +2,7 @@ import { IWidgetType } from "./types";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import Grid from "@/ui/Grid.vue";
 
 export const config: ({ component: any } & IWidgetType)[] = [
 	{
@@ -77,6 +78,12 @@ export const config: ({ component: any } & IWidgetType)[] = [
 		],
 		slots: ["body"],
 		component: Column,
+	},
+	{
+		name: "Grid",
+		dataTransfer: true,
+		slots: ["default"],
+		component: Grid,
 	},
 ];
 

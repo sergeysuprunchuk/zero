@@ -12,7 +12,5 @@ export const bind = (ctx: IContext, events: Nullable<IEvent[]>) => {
 		};
 	});
 
-	console.log(result);
-
 	return result;
 };

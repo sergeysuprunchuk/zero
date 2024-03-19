@@ -95,7 +95,7 @@ const widgetKey = ref<number>(0);
 					:options="forms"
 				/>
 			</header>
-			<div class="flex items-center justify-center h-full w-full">
+			<div class="h-full w-full">
 				<Widget
 					:key="widgetKey"
 					:ctx="ctx"
