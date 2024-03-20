@@ -26,6 +26,14 @@ provide("register", (id: number, ctx: IContext): IContext => {
 	return ctx;
 });
 
+const grids = ref<{ [id: number]: any }>({});
+
+provide("grids", (id) => grids.value[id]);
+
+provide("setGrids", (newGrids: { [id: number]: any }) => {
+	grids.value = { ...grids.value, ...newGrids };
+});
+
 const currentForm = ref<string>(forms[0]);
 
 const widget = ref<IWidget>(nullWidget());

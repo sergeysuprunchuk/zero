@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, inject, onBeforeMount, useSlots } from "vue";
 import { GridStack } from "gridstack";
+import _ from "lodash";
 
 const grids = inject("grids", {});
 
@@ -18,6 +19,7 @@ const items = computed<any>(() => {
 				GridStack.init({ float: true });
 			});
 		}
+		console.log(slots.default()[0].children);
 		return slots.default()[0].children;
 	}
 	return [];
@@ -26,11 +28,40 @@ const items = computed<any>(() => {
 onBeforeMount(() => {
 	setTimeout(() => {
 		grid = GridStack.init({ float: true });
-		grid.on("dragstop", function (event) {
-			console.log(event);
-		});
+		grid
+			.on("dragstop", (event) => {
+				const newGrids = {};
+				grid.save(true).forEach((item) => {
+					newGrids[item.id] = item;
+				});
+				setGrids(newGrids);
+			})
+			.on(
+				"resize",
+				_.debounce((event) => {
+					const newGrids = {};
+					grid.save(true).forEach((item) => {
+						newGrids[item.id] = item;
+					});
+					setGrids(newGrids);
+				}, 500),
+			);
 	});
 });
+
+const attrs = (key: number) => {
+	const grid = grids(key);
+	if (!grid) {
+		return {};
+	}
+	return {
+		"gs-id": key,
+		"gs-w": grid.w,
+		"gs-h": grid.h,
+		"gs-x": grid.x,
+		"gs-y": grid.y,
+	};
+};
 </script>
 
 <template>
@@ -41,11 +72,10 @@ onBeforeMount(() => {
 		<div
 			v-for="item in items"
 			class="grid-stack-item"
+			:gs-id="item.key"
+			v-bind="attrs(item.key)"
 		>
-			<div
-				@dragend="change"
-				class="grid-stack-item-content flex items-center justify-center bg-white rounded-xl shadow-lg"
-			>
+			<div class="grid-stack-item-content">
 				<component :is="item" />
 			</div>
 		</div>

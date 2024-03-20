@@ -3,35 +3,31 @@ import { create } from "@/modules/context";
 import { ISchema } from "@/modules/handler";
 import { ref } from "vue";
 import WidgetEditor from "@/modules/widgetEditor/WidgetEditor.vue";
-import Grid from "@/ui/Grid.vue";
-import Button from "primevue/button";
+import { useQuery } from "@/modules/query/utils.ts";
+
+const { get, _delete } = useQuery();
 
 const ctx = ref(
 	create(null, {
-		data: {
-			id: 1,
-			name: "Leanne Graham",
-			username: "Bret",
-			email: "Sincere@april.biz",
+		get: async ({ key, url }: any) => {
+			return { data: await get(key, url) };
 		},
-		удалить: async ({ url }: any) => {
-			console.log(url);
+		_delete: async (url: string) => {
+			await _delete(url);
 		},
 	}),
 );
 
 const schemas: ISchema[] = [
 	{
-		name: "удалить",
-		accepts: [{ binds: { name: "url", type: "primetext" } }],
+		name: "get",
+		accepts: [
+			{ binds: { name: "key", type: "primetext", placeholder: "key" } },
+			{ binds: { name: "url", type: "primetext", placeholder: "url" } },
+		],
+		returns: ["data"],
 	},
 ];
-
-const incr = ref(3);
-
-setTimeout(() => {
-	incr.value++;
-}, 5_000);
 </script>
 
 <template>
