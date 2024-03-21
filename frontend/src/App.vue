@@ -5,15 +5,18 @@ import { ref } from "vue";
 import WidgetEditor from "@/modules/widgetEditor/WidgetEditor.vue";
 import { useQuery } from "@/modules/query/utils.ts";
 
-const { get, _delete } = useQuery();
+const { get, _delete, invalidate } = useQuery();
 
 const ctx = ref(
 	create(null, {
 		get: async ({ key, url }: any) => {
 			return { data: await get(key, url) };
 		},
-		_delete: async (url: string) => {
+		_delete: async ({ url }: any) => {
 			await _delete(url);
+		},
+		invalidate: async ({ key }: any) => {
+			await invalidate(key);
 		},
 	}),
 );
@@ -26,6 +29,18 @@ const schemas: ISchema[] = [
 			{ binds: { name: "url", type: "primetext", placeholder: "url" } },
 		],
 		returns: ["data"],
+	},
+	{
+		name: "_delete",
+		accepts: [
+			{ binds: { name: "url", type: "primetext", placeholder: "url" } },
+		],
+	},
+	{
+		name: "invalidate",
+		accepts: [
+			{ binds: { name: "key", type: "primetext", placeholder: "key" } },
+		],
 	},
 ];
 </script>

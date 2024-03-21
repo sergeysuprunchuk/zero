@@ -3,9 +3,9 @@ import { Nullable } from "primevue/ts-helpers";
 import { HandlerForm, IHandler, ISchema } from "@/modules/handler";
 import { IContext } from "@/modules/context";
 import Button from "primevue/button";
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		modelValue: Nullable<IHandler[]>;
 		schemas: ISchema[];
@@ -18,6 +18,21 @@ withDefaults(
 const emit = defineEmits<{
 	"update:modelValue": [IHandler[]];
 }>();
+
+onMounted(() => {
+	if (props.modelValue) {
+		handlers.value = props.modelValue;
+	}
+});
+
+watch(
+	() => props.modelValue,
+	() => {
+		if (props.modelValue) {
+			handlers.value = props.modelValue;
+		}
+	},
+);
 
 const handlers = ref<Nullable<IHandler>[]>([]);
 </script>

@@ -1,37 +1,35 @@
 import { ref } from "vue";
 
+const dictionary: any = {};
+
+async function get(key: string, url: string) {
+	if (key in dictionary) {
+		dictionary[key].data.value = await (await fetch(url)).json();
+		return dictionary[key].data;
+	}
+
+	const data = ref<any>();
+
+	dictionary[key] = {
+		url,
+		data,
+	};
+
+	dictionary[key].data.value = await (await fetch(url)).json();
+
+	return dictionary[key].data;
+}
+
 export const useQuery = () => {
-	const dictionary: any = {};
-
 	return {
-		async get(key: string, url: string) {
-			if (key in dictionary) {
-				fetch(url)
-					.then((result: any) => result.json())
-					.then((result: any) => {
-						dictionary[key].data.value = result;
-					});
-				return;
-			}
-
-			const data = ref<any>();
-
-			dictionary[key] = {
-				url,
-				data,
-			};
-
-			fetch(url)
-				.then((result: any) => result.json())
-				.then((result: any) => {
-					dictionary[key].data.value = result;
-				});
-
-			return dictionary[key].data;
-		},
+		get,
 		async _delete(url: string) {
-			await fetch(url, { method: "DELETE" });
+			return await fetch(url, { method: "DELETE" });
 		},
-		async invalidate(key: string) {},
+		async invalidate(key: string) {
+			if (dictionary[key]) {
+				await get(key, dictionary[key].url);
+			}
+		},
 	};
 };

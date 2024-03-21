@@ -3,8 +3,7 @@ import { ParamForm } from "@/modules/param";
 import { ISchema, MultiForm } from "@/modules/handler";
 import { IWidgetType, TypeSelect } from "@/modules/widgetType";
 import SelectButton from "primevue/selectbutton";
-import { provide, ref } from "vue";
-import _ from "lodash";
+import { computed, provide, ref } from "vue";
 import { Forms } from "./enums";
 import { IContext } from "@/modules/context";
 import { IWidget, nullWidget, Widget } from "@/modules/widget";
@@ -17,7 +16,26 @@ defineProps<{
 	handlers: ISchema[];
 }>();
 
-const forms = _.values(Forms);
+const forms = computed(() => {
+	const result: string[] = [Forms.TYPE];
+	if (currentWidget.value.type.params) {
+		result.push(Forms.PARAMS);
+	}
+
+	if (currentWidget.value.type.slots) {
+		result.push(Forms.SLOTS);
+	}
+
+	if (currentWidget.value.type.emits) {
+		result.push(Forms.EVENTS);
+	}
+
+	if (currentWidget.value.type.name) {
+		result.push(Forms.HANDLERS);
+	}
+
+	return result;
+});
 
 const contexts = ref<{ [key: number]: IContext }>({});
 
@@ -34,7 +52,7 @@ provide("setGrids", (newGrids: { [id: number]: any }) => {
 	grids.value = { ...grids.value, ...newGrids };
 });
 
-const currentForm = ref<string>(forms[0]);
+const currentForm = ref<string>(Forms.TYPE);
 
 const widget = ref<IWidget>(nullWidget());
 
@@ -43,6 +61,7 @@ const currentWidget = ref<IWidget>(widget.value);
 const setType = (type: IWidgetType) => {
 	if (currentWidget.value) {
 		currentWidget.value.type = type;
+		currentForm.value = Forms.TYPE;
 		return;
 	}
 };
@@ -60,16 +79,15 @@ const widgetKey = ref<number>(0);
 			/>
 			<template v-if="currentWidget">
 				<ParamForm
-					v-if="currentWidget.type.params"
-					v-show="currentForm === Forms.PARAMS"
+					v-if="currentWidget.type.params && currentForm === Forms.PARAMS"
 					:key="currentWidget.id + currentWidget.type.name"
 					:ctx="contexts[currentWidget.id]"
 					:schemas="currentWidget.type.params"
 					v-model="currentWidget.params"
 				/>
 				<MultiEventForm
-					v-if="currentWidget.type.emits"
-					v-show="currentForm === Forms.EVENTS"
+					v-if="currentWidget.type.emits && currentForm === Forms.EVENTS"
+					:key="currentWidget.id + currentWidget.type.name"
 					:handlers="handlers"
 					:ctx="contexts[currentWidget.id]"
 					v-model="currentWidget.emits"
@@ -84,12 +102,13 @@ const widgetKey = ref<number>(0);
 					@update:model-value="widgetKey++"
 				/>
 				<SlotForm
-					v-if="currentWidget.type.slots"
-					v-show="currentForm === Forms.SLOTS"
+					v-if="currentWidget.type.slots && currentForm === Forms.SLOTS"
 					:key="currentWidget.id + currentWidget.type.name"
 					:slot-names="currentWidget.type.slots"
 					v-model="currentWidget.slots"
-					@added="(currentWidget = $event), widgetKey++"
+					@added="
+						(currentWidget = $event), widgetKey++, (currentForm = Forms.TYPE)
+					"
 				/>
 			</template>
 		</aside>
@@ -103,7 +122,7 @@ const widgetKey = ref<number>(0);
 					:options="forms"
 				/>
 			</header>
-			<div class="h-full w-full">
+			<div class="h-full w-full p-6">
 				<Widget
 					:key="widgetKey"
 					:ctx="ctx"
@@ -115,6 +134,7 @@ const widgetKey = ref<number>(0);
 			<WidgetTree
 				:widget="widget"
 				v-model="currentWidget"
+				@update:model-value="currentForm = Forms.TYPE"
 			/>
 		</aside>
 	</div>

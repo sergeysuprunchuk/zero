@@ -29,6 +29,7 @@ const value = (widget: IWidget) => {
 };
 
 const onSelect = (node: any) => {
+	console.log(node.widget);
 	emit("update:modelValue", node.widget);
 };
 </script>

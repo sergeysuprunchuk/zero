@@ -4,7 +4,7 @@ import { IParam } from "../types/param";
 import { ISchema } from "../types/schema";
 import { VariableDropdown, IContext } from "@/modules/context";
 import { FormKit } from "@formkit/vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 const props = defineProps<{
 	modelValue: Nullable<IParam>;
@@ -15,6 +15,21 @@ const props = defineProps<{
 const emit = defineEmits<{
 	"update:modelValue": [Nullable<IParam>];
 }>();
+
+onMounted(() => {
+	if (props.modelValue) {
+		isVar.value = props.modelValue.isVar;
+	}
+});
+
+watch(
+	() => props.modelValue,
+	() => {
+		if (props.modelValue) {
+			isVar.value = props.modelValue.isVar;
+		}
+	},
+);
 
 const isVar = ref<boolean>(false);
 
@@ -70,7 +85,11 @@ const getValue = computed<unknown>(() => {
 			type="primecheckbox"
 			binary
 			v-model="isVar"
-			@update:model-value="emit('update:modelValue', null)"
+			@update:model-value="
+				props.modelValue && props.modelValue.isVar === isVar
+					? null
+					: emit('update:modelValue', null)
+			"
 		/>
 	</div>
 </template>

@@ -4,7 +4,7 @@ import { IContext } from "@/modules/context";
 import EventForm from "./EventForm.vue";
 import { IEvent } from "./types";
 import { ISchema } from "@/modules/handler";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import _ from "lodash";
 import Button from "primevue/button";
 
@@ -13,7 +13,7 @@ const props = withDefaults(
 		modelValue: Nullable<IEvent[]>;
 		handlers: ISchema[];
 		ctx: IContext;
-		eventNames: string;
+		eventNames: string[];
 		title?: string;
 	}>(),
 	{ title: "События" },
@@ -34,6 +34,21 @@ onMounted(() => {
 		formData.value = newFormData;
 	}
 });
+
+watch(
+	() => props.modelValue,
+	() => {
+		if (props.modelValue) {
+			const newFormData: { [key: string]: Nullable<IEvent> } = {};
+
+			props.modelValue.forEach((param: IEvent) => {
+				newFormData[param.name] = param;
+			});
+
+			formData.value = newFormData;
+		}
+	},
+);
 
 const formData = ref<{ [key: string]: Nullable<IEvent> }>({});
 
@@ -58,6 +73,7 @@ const submit = () => {
 		<h2 class="text-center uppercase">{{ title }}</h2>
 		<EventForm
 			v-for="eventName in eventNames"
+			:key="eventName"
 			:ctx="ctx"
 			:handlers="handlers"
 			:model-value="formData[eventName]?.handlers ?? null"

@@ -60,14 +60,14 @@ executeAll(newCtx.value, props.widget.handlers).then(() => {
 							v-for="widget in slot.widgets"
 							:key="widget.id"
 							:widget="widget"
-							:ctx="create(newCtx, { ...slotProps })"
+							:ctx="create(newCtx, slotProps?.data ?? {})"
 						/>
 					</template>
 				</component>
 				<Widget
 					v-else
 					:widget="widget"
-					:ctx="create(newCtx, { ...slotProps })"
+					:ctx="create(newCtx, slotProps?.data ?? {})"
 				/>
 			</template>
 		</template>

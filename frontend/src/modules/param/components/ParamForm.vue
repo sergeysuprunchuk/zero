@@ -3,7 +3,7 @@ import { Nullable } from "primevue/ts-helpers";
 import { IParam } from "../types/param";
 import { ISchema } from "../types/schema";
 import { IContext } from "@/modules/context";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import ParamField from "./ParamField.vue";
 import _ from "lodash";
 
@@ -34,6 +34,21 @@ onMounted(() => {
 		formData.value = newFormData;
 	}
 });
+
+watch(
+	() => props.modelValue,
+	() => {
+		if (props.modelValue) {
+			const newFormData: { [key: string]: Nullable<IParam> } = {};
+
+			props.modelValue.forEach((param: IParam) => {
+				newFormData[param.name] = param;
+			});
+
+			formData.value = newFormData;
+		}
+	},
+);
 
 const onUpdate = _.debounce((): void => {
 	const newModelValue: IParam[] = [];

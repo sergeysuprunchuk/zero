@@ -4,11 +4,11 @@ import { IContext } from "@/modules/context";
 import { IHandler } from "../types/handler";
 import { ISchema } from "../types/schema";
 import { FormKit } from "@formkit/vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { ParamForm } from "@/modules/param";
 import AliasForm from "./AliasForm.vue";
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		modelValue: Nullable<IHandler>;
 		schemas: ISchema[];
@@ -21,6 +21,12 @@ withDefaults(
 const emit = defineEmits<{
 	"update:modelValue": [IHandler];
 }>();
+
+onMounted(() => {
+	if (props.modelValue) {
+		current.value = props.schemas.find((i) => i.name === props.modelValue.name);
+	}
+});
 
 const current = ref<ISchema>();
 </script>
@@ -38,7 +44,9 @@ const current = ref<ISchema>();
 			option-label="name"
 			v-model="current"
 			@update:model-value="
-				emit('update:modelValue', { name: (<ISchema>$event).name })
+				modelValue?.name === $event.name
+					? null
+					: emit('update:modelValue', { name: (<ISchema>$event).name })
 			"
 		/>
 		<template v-if="current && modelValue">
