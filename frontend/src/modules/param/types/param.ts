@@ -3,4 +3,5 @@ export interface IParam {
 	type: string;
 	value: unknown;
 	isVar: boolean;
+	twoWay?: boolean;
 }

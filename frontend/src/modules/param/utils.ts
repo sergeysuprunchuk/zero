@@ -1,5 +1,5 @@
 import { IParam } from "./types/param";
-import { get, IContext } from "@/modules/context";
+import { get, IContext, set } from "@/modules/context";
 import { Nullable } from "primevue/ts-helpers";
 import _ from "lodash";
 
@@ -12,6 +12,12 @@ export const bind = (
 	params?.forEach((param: IParam) => {
 		if (param.isVar) {
 			result[param.name] = get(ctx, <string>param.value);
+			if (param.twoWay) {
+				result[`onUpdate:${param.name}`] = (event: any) => {
+					result[param.name] = event;
+					set(ctx, <string>param.value, event);
+				};
+			}
 			return;
 		}
 
@@ -49,4 +55,23 @@ const parseTemplate = (ctx: IContext, template: string): string => {
 	}
 
 	return value;
+};
+
+export const castType = (type: string, value: string): unknown => {
+	try {
+		switch (type) {
+			case "string":
+				return value;
+			case "number":
+				return Number(value);
+			case "boolean":
+				return Boolean(value);
+			case "object":
+				return JSON.parse(value);
+			default:
+				return null;
+		}
+	} catch {
+		return null;
+	}
 };

@@ -3,6 +3,10 @@ import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Grid from "@/ui/Grid.vue";
+import Div from "@/ui/Div.vue";
+import Dialog from "primevue/dialog";
+
+console.log(Dialog);
 
 export const config: ({ component: any } & IWidgetType)[] = [
 	{
@@ -81,9 +85,31 @@ export const config: ({ component: any } & IWidgetType)[] = [
 	},
 	{
 		name: "Grid",
-		dataTransfer: true,
+		dataTransfer: false,
 		slots: ["default"],
 		component: Grid,
+	},
+	{
+		name: "Div",
+		dataTransfer: false,
+		slots: ["default"],
+		component: Div,
+	},
+	{
+		name: "Dialog",
+		dataTransfer: false,
+		params: [
+			{
+				twoWay: true,
+				binds: {
+					type: "checkbox",
+					name: "visible",
+					placeholder: "видимый",
+				},
+			},
+		],
+		slots: ["default"],
+		component: Dialog,
 	},
 ];
 

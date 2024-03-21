@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import { create } from "@/modules/context";
+import { create, invert } from "@/modules/context";
 import { ISchema } from "@/modules/handler";
 import { ref } from "vue";
 import WidgetEditor from "@/modules/widgetEditor/WidgetEditor.vue";
 import { useQuery } from "@/modules/query/utils.ts";
+import { add } from "@/modules/context";
+import { castType } from "@/modules/param";
 
 const { get, _delete, invalidate } = useQuery();
 
@@ -20,6 +22,14 @@ const ctx = ref(
 		},
 	}),
 );
+
+add(ctx.value, "add variable", async ({ key, type, value }: any) => {
+	add(ctx.value, key, castType(type, value));
+});
+
+add(ctx.value, "invert", async ({ key }: any) => {
+	invert(ctx.value, key);
+});
 
 const schemas: ISchema[] = [
 	{
@@ -38,6 +48,20 @@ const schemas: ISchema[] = [
 	},
 	{
 		name: "invalidate",
+		accepts: [
+			{ binds: { name: "key", type: "primetext", placeholder: "key" } },
+		],
+	},
+	{
+		name: "add variable",
+		accepts: [
+			{ binds: { name: "key", type: "primetext", placeholder: "key" } },
+			{ binds: { name: "type", type: "primetext", placeholder: "type" } },
+			{ binds: { name: "value", type: "primetext", placeholder: "value" } },
+		],
+	},
+	{
+		name: "invert",
 		accepts: [
 			{ binds: { name: "key", type: "primetext", placeholder: "key" } },
 		],

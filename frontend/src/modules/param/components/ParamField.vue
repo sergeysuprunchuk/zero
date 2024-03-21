@@ -47,6 +47,7 @@ const onUpdate = (value: unknown): void => {
 		name: props.schema.binds.name,
 		type: typeof value,
 		value,
+		twoWay: props.schema.twoWay,
 	});
 };
 

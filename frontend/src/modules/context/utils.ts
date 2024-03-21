@@ -56,6 +56,24 @@ export const variables = (ctx: IContext): { [key: string]: unknown } => {
 	return { ...ctx.namespace };
 };
 
+export const invert = (ctx: IContext, key: string): void => {
+	let value: any = ctx.namespace;
+
+	const keys: string[] = key.split(".");
+
+	for (let index = 0; index < keys.length; index++) {
+		if (_.isPlainObject(value) && keys[index] in value) {
+			if (index + 1 === keys.length) {
+				value[keys[index]] = !value[keys[index]];
+				return;
+			}
+			value = value[keys[index]];
+		} else if (ctx.parent !== null) {
+			return invert(ctx.parent, key);
+		}
+	}
+};
+
 export const keyTree = (
 	vars: { [key: string]: unknown },
 	parent: string | null = null,
