@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { ParamForm } from "@/modules/param";
-import { ISchema, MultiForm } from "@/modules/handler";
+import { executeAll, IHandler, ISchema, MultiForm } from "@/modules/handler";
 import { IWidgetType, TypeSelect } from "@/modules/widgetType";
 import SelectButton from "primevue/selectbutton";
 import { computed, provide, ref } from "vue";
 import { Forms } from "./enums";
-import { IContext } from "@/modules/context";
+import { add, create, IContext } from "@/modules/context";
 import { IWidget, nullWidget, Widget } from "@/modules/widget";
 import SlotForm from "@/modules/slot/SlotForm.vue";
 import WidgetTree from "@/modules/widgetTree/WidgetTree.vue";
 import { MultiEventForm } from "@/modules/event";
+import { ISlot, ISlotDescription, ISlotParameter } from "@/modules/slot";
+import { set } from "lodash";
 
 defineProps<{
 	ctx: IContext;
@@ -18,35 +20,28 @@ defineProps<{
 
 const forms = computed(() => {
 	const result: string[] = [Forms.TYPE];
-	if (currentWidget.value.type.params) {
+	if (selectedWidget.value.type.params) {
 		result.push(Forms.PARAMS);
 	}
 
-	if (currentWidget.value.type.slots) {
+	if (selectedWidget.value.type.slots) {
 		result.push(Forms.SLOTS);
 	}
 
-	if (currentWidget.value.type.emits) {
+	if (selectedWidget.value.type.emits) {
 		result.push(Forms.EVENTS);
 	}
 
-	if (currentWidget.value.type.name) {
+	if (selectedWidget.value.type.name) {
 		result.push(Forms.HANDLERS);
 	}
 
 	return result;
 });
 
-const contexts = ref<{ [key: number]: IContext }>({});
-
-provide("register", (id: number, ctx: IContext): IContext => {
-	contexts.value[id] = ctx;
-	return ctx;
-});
-
 const grids = ref<{ [id: number]: any }>({});
 
-provide("grids", (id) => grids.value[id]);
+provide("grids", (id: number) => grids.value[id]);
 
 provide("setGrids", (newGrids: { [id: number]: any }) => {
 	grids.value = { ...grids.value, ...newGrids };
@@ -54,19 +49,93 @@ provide("setGrids", (newGrids: { [id: number]: any }) => {
 
 const currentForm = ref<string>(Forms.TYPE);
 
-const widget = ref<IWidget>(nullWidget());
-
-const currentWidget = ref<IWidget>(widget.value);
-
 const setType = (type: IWidgetType) => {
-	if (currentWidget.value) {
-		currentWidget.value.type = type;
+	if (selectedWidget.value) {
+		selectedWidget.value.type = type;
 		currentForm.value = Forms.TYPE;
 		return;
 	}
 };
 
 const widgetKey = ref<number>(0);
+
+//РЕФАКТОРИНГ ==>.
+
+const contexts = ref<{ [id: number]: IContext }>({});
+
+const getContext = (id: number): IContext => {
+	return contexts.value[id];
+};
+
+const registerContext = (
+	id: number,
+	context: IContext,
+	owner: IWidget,
+): IContext => {
+	contexts.value[id] = context;
+	add(context, "$owner", owner);
+	return context;
+};
+
+const addSlot = (
+	context: IContext,
+	parent: IWidget,
+	slotDescription: ISlotDescription,
+): IWidget => {
+	let midlayer: IContext | null = null;
+
+	if (slotDescription.parameters) {
+		let namespace: { [key: string]: unknown } = {};
+
+		slotDescription.parameters.forEach((parameter: ISlotParameter) => {
+			namespace = { ...parameter.handler(context) };
+		});
+
+		midlayer = create(context, namespace);
+	}
+
+	const newWidget = nullWidget();
+
+	registerContext(
+		newWidget.id,
+		create(midlayer !== null ? midlayer : context),
+		newWidget,
+	);
+
+	if (!parent.slots) {
+		parent.slots = [];
+	}
+
+	const index = parent.slots.findIndex(
+		(slot: ISlot) => slot.name === slotDescription.name,
+	);
+
+	if (index === -1) {
+		parent.slots.push({
+			name: slotDescription.name,
+			widgets: [newWidget],
+			parameterNames: slotDescription.parameters?.map(
+				(parameter: ISlotParameter) => parameter.name,
+			),
+		});
+	} else {
+		parent.slots[index].widgets.push(newWidget);
+	}
+
+	return newWidget;
+};
+
+const rootWidget = ref<IWidget>(nullWidget());
+
+registerContext(rootWidget.value.id, create(), rootWidget.value);
+
+const selectedWidget = ref<IWidget>(rootWidget.value);
+
+const setHandlers = async (widget: IWidget, handlers: IHandler[]) => {
+	await executeAll(getContext(widget.id), handlers);
+	widget.handlers = handlers;
+	console.log(widget, handlers, getContext(widget.id));
+};
 </script>
 
 <template>
@@ -74,40 +143,43 @@ const widgetKey = ref<number>(0);
 		<aside class="w-96 h-full bg-white border-r p-3 overflow-y-auto">
 			<TypeSelect
 				v-show="currentForm === Forms.TYPE"
-				:model-value="currentWidget?.type"
+				:model-value="selectedWidget?.type"
 				@update:model-value="setType"
 			/>
-			<template v-if="currentWidget">
+			<template v-if="selectedWidget">
 				<ParamForm
-					v-if="currentWidget.type.params && currentForm === Forms.PARAMS"
-					:key="currentWidget.id + currentWidget.type.name"
-					:ctx="contexts[currentWidget.id]"
-					:schemas="currentWidget.type.params"
-					v-model="currentWidget.params"
+					v-if="selectedWidget.type.params && currentForm === Forms.PARAMS"
+					:key="selectedWidget.id + selectedWidget.type.name"
+					:ctx="contexts[selectedWidget.id]"
+					:schemas="selectedWidget.type.params"
+					v-model="selectedWidget.params"
 				/>
 				<MultiEventForm
-					v-if="currentWidget.type.emits && currentForm === Forms.EVENTS"
-					:key="currentWidget.id + currentWidget.type.name"
+					v-if="selectedWidget.type.emits && currentForm === Forms.EVENTS"
+					:key="selectedWidget.id + selectedWidget.type.name"
 					:handlers="handlers"
-					:ctx="contexts[currentWidget.id]"
-					v-model="currentWidget.emits"
-					:event-names="currentWidget.type.emits"
+					:ctx="contexts[selectedWidget.id]"
+					v-model="selectedWidget.emits"
+					:event-names="selectedWidget.type.emits"
 				/>
 				<MultiForm
 					v-show="currentForm === Forms.HANDLERS"
-					:ctx="contexts[currentWidget.id]"
-					:key="currentWidget.id + currentWidget.type.name"
+					:ctx="contexts[selectedWidget.id]"
+					:key="selectedWidget.id + selectedWidget.type.name"
 					:schemas="handlers"
-					v-model="currentWidget.handlers"
-					@update:model-value="widgetKey++"
+					:model-value="selectedWidget.handlers"
+					@update:model-value="setHandlers(selectedWidget, $event), widgetKey++"
 				/>
 				<SlotForm
-					v-if="currentWidget.type.slots && currentForm === Forms.SLOTS"
-					:key="currentWidget.id + currentWidget.type.name"
-					:slot-names="currentWidget.type.slots"
-					v-model="currentWidget.slots"
-					@added="
-						(currentWidget = $event), widgetKey++, (currentForm = Forms.TYPE)
+					v-if="selectedWidget.type.slots && currentForm === Forms.SLOTS"
+					:options="selectedWidget.type.slots"
+					@submit="
+						(selectedWidget = addSlot(
+							<IContext>getContext(selectedWidget.id),
+							selectedWidget,
+							$event,
+						)),
+							(currentForm = Forms.TYPE)
 					"
 				/>
 			</template>
@@ -126,14 +198,14 @@ const widgetKey = ref<number>(0);
 				<Widget
 					:key="widgetKey"
 					:ctx="ctx"
-					:widget="widget"
+					:widget="rootWidget"
 				/>
 			</div>
 		</div>
 		<aside class="w-96 h-full bg-white border-l p-3 overflow-y-auto">
 			<WidgetTree
-				:widget="widget"
-				v-model="currentWidget"
+				:widget="rootWidget"
+				v-model="selectedWidget"
 				@update:model-value="currentForm = Forms.TYPE"
 			/>
 		</aside>

@@ -5,10 +5,11 @@ import Wind from "@/assets/presets/wind";
 import { formkit } from "@/ui/formkit";
 import "@/index.css";
 
-createApp(App)
+const app = createApp(App)
 	.use(PrimeVue, {
 		unstyled: true,
 		pt: Wind,
 	})
-	.use(formkit)
-	.mount("#app");
+	.use(formkit);
+
+app.mount("#app");

@@ -5,8 +5,10 @@ import Column from "primevue/column";
 import Grid from "@/ui/Grid.vue";
 import Div from "@/ui/Div.vue";
 import Dialog from "primevue/dialog";
-
-console.log(Dialog);
+import { IContext } from "@/modules/context";
+import { IWidget } from "@/modules/widget";
+import { bind } from "@/modules/param";
+import _ from "lodash";
 
 export const config: ({ component: any } & IWidgetType)[] = [
 	{
@@ -36,7 +38,7 @@ export const config: ({ component: any } & IWidgetType)[] = [
 				},
 			},
 		],
-		slots: ["default"],
+		slots: [{ name: "default" }],
 		component: Button,
 		emits: ["click"],
 	},
@@ -58,7 +60,7 @@ export const config: ({ component: any } & IWidgetType)[] = [
 				},
 			},
 		],
-		slots: ["default"],
+		slots: [{ name: "default" }],
 		component: DataTable,
 	},
 	{
@@ -80,19 +82,64 @@ export const config: ({ component: any } & IWidgetType)[] = [
 				},
 			},
 		],
-		slots: ["body"],
+		slots: [
+			{
+				name: "body",
+				parameters: [
+					{
+						name: "data",
+						handler: (context: IContext) => {
+							if (!context.namespace["$owner"]) {
+								return {};
+							}
+
+							let table: IWidget | null = null;
+
+							let current: IContext | null = context;
+
+							while (current !== null) {
+								if (
+									current.namespace["$owner"] &&
+									(<IWidget>current.namespace["$owner"]).type.name ===
+										"DataTable"
+								) {
+									table = <IWidget>current.namespace["$owner"];
+									break;
+								}
+
+								if (current.parent) {
+									current = current.parent;
+									continue;
+								}
+
+								return {};
+							}
+
+							if (table !== null && table.params && table.params.length) {
+								const value = bind(context, table.params)["value"];
+								if (value && _.isArray(value) && value.length) {
+									return { ...value[0] };
+								}
+							}
+
+							return {};
+						},
+					},
+				],
+			},
+		],
 		component: Column,
 	},
 	{
 		name: "Grid",
 		dataTransfer: false,
-		slots: ["default"],
+		slots: [{ name: "default" }],
 		component: Grid,
 	},
 	{
 		name: "Div",
 		dataTransfer: false,
-		slots: ["default"],
+		slots: [{ name: "default" }],
 		component: Div,
 	},
 	{
@@ -108,7 +155,7 @@ export const config: ({ component: any } & IWidgetType)[] = [
 				},
 			},
 		],
-		slots: ["default"],
+		slots: [{ name: "default" }],
 		component: Dialog,
 	},
 ];
