@@ -13,7 +13,7 @@ import { MultiEventForm } from "@/modules/event";
 import { ISlot, ISlotDescription, ISlotParameter } from "@/modules/slot";
 import { set } from "lodash";
 
-defineProps<{
+const props = defineProps<{
 	ctx: IContext;
 	handlers: ISchema[];
 }>();
@@ -127,14 +127,13 @@ const addSlot = (
 
 const rootWidget = ref<IWidget>(nullWidget());
 
-registerContext(rootWidget.value.id, create(), rootWidget.value);
+registerContext(rootWidget.value.id, create(props.ctx), rootWidget.value);
 
 const selectedWidget = ref<IWidget>(rootWidget.value);
 
 const setHandlers = async (widget: IWidget, handlers: IHandler[]) => {
 	await executeAll(getContext(widget.id), handlers);
 	widget.handlers = handlers;
-	console.log(widget, handlers, getContext(widget.id));
 };
 </script>
 
@@ -153,6 +152,7 @@ const setHandlers = async (widget: IWidget, handlers: IHandler[]) => {
 					:ctx="contexts[selectedWidget.id]"
 					:schemas="selectedWidget.type.params"
 					v-model="selectedWidget.params"
+					@update:model-value="widgetKey++"
 				/>
 				<MultiEventForm
 					v-if="selectedWidget.type.emits && currentForm === Forms.EVENTS"
@@ -179,7 +179,8 @@ const setHandlers = async (widget: IWidget, handlers: IHandler[]) => {
 							selectedWidget,
 							$event,
 						)),
-							(currentForm = Forms.TYPE)
+							(currentForm = Forms.TYPE),
+							widgetKey++
 					"
 				/>
 			</template>

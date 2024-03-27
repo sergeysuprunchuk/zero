@@ -11,3 +11,7 @@
 		font-family: roboto-mono, sans-serif;
 	}
 }
+
+.formkit-form {
+	@apply flex flex-col gap-3 bg-white p-3 rounded-xl;
+}

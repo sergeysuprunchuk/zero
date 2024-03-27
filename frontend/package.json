@@ -11,6 +11,7 @@
 	"dependencies": {
 		"@formkit/vue": "^1.6.0",
 		"@types/lodash": "^4.17.0",
+		"axios": "^1.6.8",
 		"gridstack": "^10.1.1",
 		"lodash": "^4.17.21",
 		"primevue": "^3.49.1",

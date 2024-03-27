@@ -5,6 +5,7 @@ import Column from "primevue/column";
 import Grid from "@/ui/Grid.vue";
 import Div from "@/ui/Div.vue";
 import Dialog from "primevue/dialog";
+import { FormKit } from "@formkit/vue";
 import { IContext } from "@/modules/context";
 import { IWidget } from "@/modules/widget";
 import { bind } from "@/modules/param";
@@ -40,7 +41,7 @@ export const config: ({ component: any } & IWidgetType)[] = [
 		],
 		slots: [{ name: "default" }],
 		component: Button,
-		emits: ["click"],
+		emits: [{ name: "click" }],
 	},
 	{
 		name: "DataTable",
@@ -157,6 +158,75 @@ export const config: ({ component: any } & IWidgetType)[] = [
 		],
 		slots: [{ name: "default" }],
 		component: Dialog,
+	},
+	{
+		name: "FormKit",
+		dataTransfer: false,
+		emits: [{ name: "submit", hasData: true }],
+		params: [
+			{
+				binds: {
+					name: "type",
+					type: "primedropdown",
+					options: [
+						"form",
+						"primetext",
+						"primenumber",
+						"primecheckbox",
+						"primedropdown",
+						"primemulti",
+					],
+					placeholder: "type",
+				},
+			},
+			{
+				binds: {
+					name: "placeholder",
+					type: "primetext",
+					placeholder: "placeholder",
+				},
+			},
+			{
+				binds: {
+					name: "binary",
+					type: "primecheckbox",
+					binary: true,
+					placeholder: "binary",
+				},
+			},
+			{
+				set: (arg: any): unknown => {
+					return JSON.parse(arg);
+				},
+				get: (arg: any): unknown => {
+					return JSON.stringify(arg);
+				},
+				binds: { name: "options", type: "primetext", placeholder: "options" },
+			},
+			{
+				binds: {
+					name: "optionLabel",
+					type: "primetext",
+					placeholder: "optionLabel",
+				},
+			},
+			{
+				binds: {
+					name: "optionValue",
+					type: "primetext",
+					placeholder: "optionValue",
+				},
+			},
+			{
+				binds: {
+					name: "name",
+					type: "primetext",
+					placeholder: "name",
+				},
+			},
+		],
+		slots: [{ name: "default" }],
+		component: FormKit,
 	},
 ];
 

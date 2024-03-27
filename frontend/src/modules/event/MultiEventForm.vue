@@ -2,9 +2,9 @@
 import { Nullable } from "primevue/ts-helpers";
 import { IContext } from "@/modules/context";
 import EventForm from "./EventForm.vue";
-import { IEvent } from "./types";
+import { IEvent, IEventDescription } from "./types";
 import { ISchema } from "@/modules/handler";
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch } from "vue";
 import _ from "lodash";
 import Button from "primevue/button";
 
@@ -13,7 +13,7 @@ const props = withDefaults(
 		modelValue: Nullable<IEvent[]>;
 		handlers: ISchema[];
 		ctx: IContext;
-		eventNames: string[];
+		eventNames: IEventDescription[];
 		title?: string;
 	}>(),
 	{ title: "События" },
@@ -73,14 +73,19 @@ const submit = () => {
 		<h2 class="text-center uppercase">{{ title }}</h2>
 		<EventForm
 			v-for="eventName in eventNames"
-			:key="eventName"
+			:key="eventName.name"
 			:ctx="ctx"
 			:handlers="handlers"
-			:model-value="formData[eventName]?.handlers ?? null"
+			:model-value="formData[eventName.name]?.handlers ?? null"
 			@update:model-value="
-				formData[eventName] = { name: eventName, handlers: $event }
+				formData[eventName.name] = {
+					name: eventName.name,
+					handlers: $event,
+					hasData: eventName.hasData,
+				}
 			"
-			:event-name="eventName"
+			:has-data="eventName.hasData ?? false"
+			:event-name="eventName.name"
 		/>
 		<Button
 			@click="submit"

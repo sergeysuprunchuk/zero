@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IContext } from "@/modules/context";
+import { create, IContext } from "@/modules/context";
 import { IHandler, ISchema, MultiForm } from "@/modules/handler";
 import { Nullable } from "primevue/ts-helpers";
 
@@ -8,6 +8,7 @@ defineProps<{
 	ctx: IContext;
 	eventName: string;
 	handlers: ISchema[];
+	hasData: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -22,7 +23,7 @@ const emit = defineEmits<{
 	>
 		<h2 class="text-center uppercase">{{ eventName }}</h2>
 		<MultiForm
-			:ctx="ctx"
+			:ctx="hasData ? create(ctx, { event: null }) : ctx"
 			:schemas="handlers"
 			:model-value="modelValue"
 			@update:model-value="emit('update:modelValue', $event)"

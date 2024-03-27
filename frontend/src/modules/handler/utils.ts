@@ -27,6 +27,8 @@ export const execute = async (
 					}
 
 					add(ctx, name, data[key]);
+
+					console.log("add to ctx", ctx);
 				});
 			}
 		} catch (error: any) {

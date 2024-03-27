@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import axios from "axios";
 
 const dictionary: any = {};
 
@@ -24,7 +25,10 @@ export const useQuery = () => {
 	return {
 		get,
 		async _delete(url: string) {
-			return await fetch(url, { method: "DELETE" });
+			return await axios.delete(url);
+		},
+		async _add(url: string, body: any) {
+			return await axios.post(url, body);
 		},
 		async invalidate(key: string) {
 			if (dictionary[key]) {

@@ -19,7 +19,6 @@ const items = computed<any>(() => {
 				GridStack.init({ float: true });
 			});
 		}
-		console.log(slots.default()[0].children);
 		return slots.default()[0].children;
 	}
 	return [];
@@ -27,7 +26,10 @@ const items = computed<any>(() => {
 
 onBeforeMount(() => {
 	setTimeout(() => {
-		grid = GridStack.init({ float: true });
+		grid = GridStack.init({
+			float: true,
+			cellHeight: "initial",
+		});
 		grid
 			.on("dragstop", (event) => {
 				const newGrids = {};

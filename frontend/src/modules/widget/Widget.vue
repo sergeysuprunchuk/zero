@@ -43,7 +43,7 @@ executeAll(newCtx.value, props.widget.handlers).then(() => {
 		v-else
 		:is="widgetByType(widget.type.name)"
 		v-bind="bind(newCtx, widget.params)"
-		v-on="bindEvent(newCtx, widget.emits)"
+		v-on.prevent="bindEvent(newCtx, widget.emits)"
 	>
 		<template
 			v-for="slot in widget.slots"

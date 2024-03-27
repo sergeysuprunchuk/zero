@@ -7,7 +7,7 @@ import { useQuery } from "@/modules/query/utils.ts";
 import { add } from "@/modules/context";
 import { castType } from "@/modules/param";
 
-const { get, _delete, invalidate } = useQuery();
+const { get, _delete, invalidate, _add } = useQuery();
 
 const ctx = ref(
 	create(null, {
@@ -19,6 +19,9 @@ const ctx = ref(
 		},
 		invalidate: async ({ key }: any) => {
 			await invalidate(key);
+		},
+		_add: async ({ url, body }: any) => {
+			await _add(url, body);
 		},
 	}),
 );
@@ -44,6 +47,13 @@ const schemas: ISchema[] = [
 		name: "_delete",
 		accepts: [
 			{ binds: { name: "url", type: "primetext", placeholder: "url" } },
+		],
+	},
+	{
+		name: "_add",
+		accepts: [
+			{ binds: { name: "url", type: "primetext", placeholder: "url" } },
+			{ binds: { name: "body", type: "primetext", placeholder: "url" } },
 		],
 	},
 	{
